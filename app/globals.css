@@ -92,3 +92,23 @@ h2 {
     border-color: var(--foreground);
   }
 }
+
+/* ספינר מהיר: ספינר מהיר גורם לטעינה להרגיש מהירה יותר (emil-design-eng) */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  border: 2px solid var(--border);
+  border-top-color: var(--foreground);
+  animation: spin 600ms linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 1500ms;
+  }
+}

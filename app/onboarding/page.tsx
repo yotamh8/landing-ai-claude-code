@@ -12,10 +12,10 @@ export default async function OnboardingPage() {
   if (await getMyBusiness(supabase, user.id)) redirect("/dashboard");
 
   return (
-    <main className="enter mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-8 px-4">
+    <main className="enter mx-auto flex min-h-screen max-w-xl flex-col items-center justify-center gap-8 px-4 py-12">
       <div className="text-center">
         <h1 className="text-3xl font-bold">ברוכים הבאים!</h1>
-        <p className="mt-2 opacity-80">נתחיל מכמה פרטים על העסק שלך.</p>
+        <p className="mt-2 opacity-80">ספרו לנו על העסק, ונכתוב לכם דף נחיתה ראשון.</p>
       </div>
       <OnboardingForm />
     </main>

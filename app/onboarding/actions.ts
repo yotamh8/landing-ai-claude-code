@@ -1,21 +1,17 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SLUG_PATTERN } from "@/lib/business";
+import { briefFromFormData, parseBrief } from "@/lib/brief";
 
-export type OnboardingState = { error?: string };
+export type OnboardingResult = { ok: true } | { error: string };
 
-export async function createBusiness(
-  _prev: OnboardingState,
-  formData: FormData,
-): Promise<OnboardingState> {
-  const name = String(formData.get("name") ?? "").trim();
+export async function createBusiness(formData: FormData): Promise<OnboardingResult> {
+  const parsed = parseBrief(briefFromFormData(formData));
+  if ("error" in parsed) return { error: parsed.error };
+  const { brief } = parsed;
+
   const slug = String(formData.get("slug") ?? "").trim().toLowerCase();
-
-  if (name.length < 2 || name.length > 80) {
-    return { error: "שם העסק צריך להכיל בין 2 ל-80 תווים." };
-  }
   if (slug.length < 3 || slug.length > 40 || !SLUG_PATTERN.test(slug)) {
     return {
       error: "הכתובת צריכה להכיל 3–40 תווים: אותיות באנגלית קטנות, ספרות ומקפים בלבד.",
@@ -26,11 +22,18 @@ export async function createBusiness(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/");
+  if (!user) return { error: "צריך להתחבר מחדש." };
 
-  const { error } = await supabase
-    .from("businesses")
-    .insert({ name, slug, owner_id: user.id });
+  const { error } = await supabase.from("businesses").insert({
+    owner_id: user.id,
+    slug,
+    name: brief.name,
+    field: brief.field,
+    city: brief.city,
+    description: brief.description,
+    audience: brief.audience,
+    style: brief.style,
+  });
 
   if (error) {
     if (error.code === "23505") {
@@ -40,6 +43,5 @@ export async function createBusiness(
     }
     return { error: "השמירה נכשלה. נסו שוב." };
   }
-
-  redirect("/dashboard");
+  return { ok: true };
 }

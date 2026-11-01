@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getMyBusiness } from "@/lib/business";
 import { signOut } from "@/app/auth/actions";
 import { BusinessNameForm } from "./business-name-form";
+import { STYLE_LABELS, type Style } from "@/lib/brief";
 
 export const metadata: Metadata = { title: "לוח בקרה | דפי נחיתה עם AI" };
 
-type PageRow = { id: string; title: string; status: "draft" | "published"; updated_at: string };
+type PageRow = { id: string; title: string; status: "draft" | "published"; template: Style; updated_at: string };
 type LeadRow = {
   id: string;
   name: string | null;
@@ -24,7 +26,12 @@ const dateFmt = new Intl.DateTimeFormat("he-IL", {
   timeZone: "Asia/Jerusalem",
 });
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error: errorParam } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -53,7 +60,7 @@ export default async function DashboardPage() {
         .gte("created_at", weekAgo),
       supabase
         .from("pages")
-        .select("id, title, status, updated_at")
+        .select("id, title, status, template, updated_at")
         .eq("business_id", business.id)
         .order("updated_at", { ascending: false })
         .limit(5)
@@ -131,6 +138,12 @@ export default async function DashboardPage() {
           <p className="opacity-70">הנה מה שקורה בעסק שלך.</p>
         </section>
 
+        {errorParam === "generate" && (
+          <p role="alert" className="rounded-lg bg-amber-100 px-4 py-3 text-amber-900">
+            העסק נשמר, אבל יצירת הדף הראשון נכשלה. אפשר לנסות שוב עם &quot;+ דף חדש&quot;.
+          </p>
+        )}
+
         {loadFailed && (
           <p role="alert" className="rounded-lg bg-red-100 px-4 py-3 text-red-800">
             חלק מהנתונים לא נטענו. נסו לרענן את הדף.
@@ -194,26 +207,31 @@ export default async function DashboardPage() {
             <section className="rounded-xl border border-[var(--border)] bg-[var(--surface)]">
               <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
                 <h3 className="font-bold">דפי הנחיתה שלי</h3>
-                <button
-                  type="button"
-                  disabled
-                  title="בקרוב"
-                  className="rounded-lg bg-[var(--foreground)] px-3 py-1.5 text-sm font-medium text-[var(--background)] opacity-50"
+                <Link
+                  href="/dashboard/new"
+                  className="pressable rounded-lg bg-[var(--foreground)] px-3 py-1.5 text-sm font-medium text-[var(--background)] hover:opacity-90"
                 >
-                  + דף חדש (בקרוב)
-                </button>
+                  + דף חדש
+                </Link>
               </div>
               {pages.length === 0 ? (
-                <Empty title="עדיין אין דפים" text="בקרוב תוכל ליצור כאן דף נחיתה עם AI בכמה קליקים." />
+                <Empty title="עדיין אין דפים" text="לחצו על &quot;+ דף חדש&quot; וה-AI יכתוב לכם דף נחיתה בכמה שניות." />
               ) : (
                 <ul className="divide-y divide-[var(--border)]">
                   {pages.map((p) => (
-                    <li key={p.id} className="flex items-center justify-between gap-3 px-4 py-3">
-                      <div className="min-w-0">
-                        <p className="truncate font-medium">{p.title || "ללא כותרת"}</p>
-                        <p className="text-xs opacity-60">עודכן {dateFmt.format(new Date(p.updated_at))}</p>
-                      </div>
-                      <StatusBadge status={p.status} />
+                    <li key={p.id}>
+                      <Link
+                        href={`/dashboard/pages/${p.id}`}
+                        className="flex items-center justify-between gap-3 px-4 py-3 transition-[background-color] duration-150 hover:bg-[var(--muted)]"
+                      >
+                        <div className="min-w-0">
+                          <p className="truncate font-medium">{p.title || "ללא כותרת"}</p>
+                          <p className="text-xs opacity-60">
+                            {STYLE_LABELS[p.template]?.name ?? ""} · עודכן {dateFmt.format(new Date(p.updated_at))}
+                          </p>
+                        </div>
+                        <StatusBadge status={p.status} />
+                      </Link>
                     </li>
                   ))}
                 </ul>
