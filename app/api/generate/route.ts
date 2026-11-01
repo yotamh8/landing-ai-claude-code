@@ -34,7 +34,7 @@ export async function POST(request: Request) {
   } catch (e) {
     console.error("generate failed:", e instanceof GenerationError ? e.message : e);
     return NextResponse.json(
-      { error: "יצירת הדף נכשלה. נסו שוב בעוד רגע." },
+      { error: "יצירת הדף נכשלה, כנראה כי שירות ה-AI עמוס כרגע. הפרטים נשארו בטופס, נסו שוב בעוד דקה." },
       { status: 502 },
     );
   }

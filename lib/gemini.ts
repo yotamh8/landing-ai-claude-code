@@ -35,44 +35,74 @@ function buildPrompt(b: Brief) {
 
 export class GenerationError extends Error {}
 
+// ניסיונות חוזרים: אם המודל עמוס (429/5xx), מחכים קצת ומנסים שוב, ואז עוברים למודל גיבוי
+const FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL || "gemini-2.5-flash";
+const ATTEMPTS: { model: string; waitMs: number }[] = [
+  { model: MODEL, waitMs: 0 },
+  { model: MODEL, waitMs: 1500 },
+  { model: FALLBACK_MODEL, waitMs: 1000 },
+  { model: FALLBACK_MODEL, waitMs: 3000 },
+];
+const RETRYABLE = new Set([429, 500, 502, 503, 504]);
+const DEADLINE_MS = 55_000;
+
 export async function generatePageContent(brief: Brief): Promise<PageContent> {
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw new GenerationError("GEMINI_API_KEY is not configured");
 
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-goog-api-key": key },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: buildPrompt(brief) }] }],
-        generationConfig: {
-          responseMimeType: "application/json",
-          responseSchema: PAGE_CONTENT_SCHEMA,
-          temperature: 0.8,
+  const started = Date.now();
+  let lastError = "no attempt";
+
+  for (const { model, waitMs } of ATTEMPTS) {
+    if (waitMs) await new Promise((r) => setTimeout(r, waitMs));
+    const remaining = DEADLINE_MS - (Date.now() - started);
+    if (remaining < 5_000) break;
+
+    let res: Response;
+    try {
+      res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-goog-api-key": key },
+          body: JSON.stringify({
+            contents: [{ role: "user", parts: [{ text: buildPrompt(brief) }] }],
+            generationConfig: {
+              responseMimeType: "application/json",
+              responseSchema: PAGE_CONTENT_SCHEMA,
+              temperature: 0.8,
+            },
+          }),
+          signal: AbortSignal.timeout(remaining),
         },
-      }),
-      signal: AbortSignal.timeout(50_000),
-    },
-  );
+      );
+    } catch (e) {
+      lastError = `${model}: ${e instanceof Error ? e.message : String(e)}`;
+      continue;
+    }
 
-  if (!res.ok) {
-    throw new GenerationError(`Gemini HTTP ${res.status}: ${(await res.text()).slice(0, 300)}`);
+    if (!res.ok) {
+      lastError = `${model} HTTP ${res.status}: ${(await res.text()).slice(0, 200)}`;
+      if (RETRYABLE.has(res.status)) continue;
+      throw new GenerationError(lastError);
+    }
+
+    const data = (await res.json()) as {
+      candidates?: { content?: { parts?: { text?: string }[] } }[];
+    };
+    const text = data.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("") ?? "";
+
+    let json: unknown;
+    try {
+      json = JSON.parse(text);
+    } catch {
+      lastError = `${model}: non-JSON output`;
+      continue;
+    }
+    const content = parsePageContent(json);
+    if (content) return content;
+    lastError = `${model}: JSON did not match the page schema`;
   }
 
-  const data = (await res.json()) as {
-    candidates?: { content?: { parts?: { text?: string }[] } }[];
-  };
-  const text = data.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("") ?? "";
-
-  let json: unknown;
-  try {
-    json = JSON.parse(text);
-  } catch {
-    throw new GenerationError("Gemini returned non-JSON output");
-  }
-
-  const content = parsePageContent(json);
-  if (!content) throw new GenerationError("Gemini JSON did not match the page schema");
-  return content;
+  throw new GenerationError(`all attempts failed, last: ${lastError}`);
 }

@@ -12,7 +12,10 @@ export function NewPageForm({ defaults }: { defaults: BriefDefaults }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string>();
 
-  async function submit(formData: FormData) {
+  async function submit(e: React.FormEvent<HTMLFormElement>) {
+    // onSubmit ולא action: כך השדות נשארים מלאים אם משהו נכשל
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
     setError(undefined);
     setBusy(true);
     const result = await requestGeneration(briefFromFormData(formData));
@@ -25,7 +28,7 @@ export function NewPageForm({ defaults }: { defaults: BriefDefaults }) {
   }
 
   return (
-    <form action={submit} className="flex flex-col gap-5">
+    <form onSubmit={submit} className="flex flex-col gap-5">
       <fieldset disabled={busy} className="flex flex-col gap-5 disabled:opacity-60">
         <BriefFields defaults={defaults} />
       </fieldset>

@@ -16,7 +16,10 @@ export function OnboardingForm() {
   const [error, setError] = useState<string>();
   const [slug, setSlug] = useState("");
 
-  async function submit(formData: FormData) {
+  async function submit(e: React.FormEvent<HTMLFormElement>) {
+    // onSubmit ולא action: כך השדות נשארים מלאים אם משהו נכשל
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
     setError(undefined);
     setStage("saving");
     const saved = await createBusiness(formData);
@@ -35,7 +38,7 @@ export function OnboardingForm() {
   const busy = stage !== "idle";
 
   return (
-    <form action={submit} className="flex w-full flex-col gap-5">
+    <form onSubmit={submit} className="flex w-full flex-col gap-5">
       <fieldset disabled={busy} className="flex flex-col gap-5 disabled:opacity-60">
         <BriefFields />
 
