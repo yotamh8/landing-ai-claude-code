@@ -12,6 +12,8 @@ export type PageContent = {
   highlights: { heading: string; items: Item[] };
   faq: { heading: string; items: Faq[] };
   contact: { heading: string; body: string; ctaText: string };
+  // תיאור באנגלית לתמונת ה-hero. נשלח למודל התמונות של Gemini
+  image_prompt?: string;
 };
 
 // סכמה בפורמט של Gemini (OpenAPI subset)
@@ -39,6 +41,7 @@ export const PAGE_CONTENT_SCHEMA = obj({
   highlights: obj({ heading: STR, items: list(itemSchema, 3, 3) }),
   faq: obj({ heading: STR, items: list(obj({ question: STR, answer: STR }), 3, 5) }),
   contact: obj({ heading: STR, body: STR, ctaText: STR }),
+  image_prompt: STR,
 });
 
 // אימות בצד השרת: לא סומכים על המודל, גם עם schema
@@ -94,6 +97,10 @@ export function parsePageContent(input: unknown): PageContent | null {
       ctaText: str(c.contact?.ctaText, 40)!,
     },
   };
+
+  // אופציונלי, כדי שדפים ישנים בלי image_prompt עדיין ייטענו
+  const imagePrompt = str(c.image_prompt, 1000);
+  if (imagePrompt) content.image_prompt = imagePrompt;
 
   const valid = (o: unknown): boolean =>
     o !== null && (typeof o !== "object" || Object.values(o as object).every(valid));

@@ -1,7 +1,8 @@
 // תבנית "רגוע": חול ומרווה, הרבה אוויר, פינות רכות, טיפוגרפיה קלה
+import { HeroImage } from "./hero-image";
 import type { TemplateProps } from "./types";
 
-export function CalmTemplate({ content: c, business: b }: TemplateProps) {
+export function CalmTemplate({ content: c, business: b, imageUrl }: TemplateProps) {
   return (
     <div className="bg-[#f6f2ec] text-[#2f3a34]" style={{ fontFamily: "var(--font-heebo)" }}>
       <header className="mx-auto flex max-w-5xl items-center justify-between px-6 py-6">
@@ -13,13 +14,16 @@ export function CalmTemplate({ content: c, business: b }: TemplateProps) {
 
       <section className="relative overflow-hidden">
         <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 -top-32 mx-auto h-[480px] w-[480px] rounded-full bg-[#dfe8df] blur-3xl" />
-        <div className="relative mx-auto flex max-w-3xl flex-col items-center gap-6 px-6 pb-24 pt-16 text-center sm:pt-24">
+        <div className="relative mx-auto flex max-w-3xl flex-col items-center gap-6 px-6 pb-16 pt-16 text-center sm:pt-24">
           <span className="rounded-full bg-white/70 px-4 py-1.5 text-sm text-[#5d7a66]">{c.hero.eyebrow}</span>
           <h1 className="text-4xl font-light sm:text-6xl">{c.hero.headline}</h1>
           <p className="max-w-xl text-lg leading-relaxed opacity-80">{c.hero.subheadline}</p>
           <a href="#contact" className="pressable mt-2 rounded-full bg-[#2f3a34] px-8 py-3.5 text-white hover:bg-[#3e4c44]">
             {c.hero.ctaText}
           </a>
+        </div>
+        <div className="relative mx-auto max-w-5xl px-6 pb-20">
+          <HeroImage src={imageUrl} style="calm" className="rounded-[2.5rem] shadow-xl shadow-[#2f3a34]/10" />
         </div>
       </section>
 

@@ -7,6 +7,7 @@ import { STYLE_LABELS, type Style } from "@/lib/brief";
 import { parsePageContent } from "@/lib/page-content";
 import { PageRenderer } from "@/components/templates";
 import { DeletePageButton } from "./delete-button";
+import { ImageStatus } from "./image-status";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -25,9 +26,16 @@ export default async function PagePreview({ params }: Params) {
   // RLS מחזיר רק דפים של העסק שלך. דף של מישהו אחר ייראה כמו דף שלא קיים
   const { data: page } = await supabase
     .from("pages")
-    .select("id, template, content, brief")
+    .select("id, template, content, brief, image_url, image_status")
     .eq("id", id)
-    .maybeSingle<{ id: string; template: Style; content: unknown; brief: Record<string, string> }>();
+    .maybeSingle<{
+      id: string;
+      template: Style;
+      content: unknown;
+      brief: Record<string, string>;
+      image_url: string | null;
+      image_status: "pending" | "generating" | "done" | "failed";
+    }>();
   if (!page) notFound();
 
   const content = parsePageContent(page.content);
@@ -44,6 +52,7 @@ export default async function PagePreview({ params }: Params) {
             תצוגה מקדימה · תבנית {STYLE_LABELS[page.template].name}
           </span>
           <div className="flex items-center gap-1">
+            <ImageStatus pageId={page.id} status={page.image_status} />
             <Link href="/dashboard/new" className="pressable rounded-lg px-3 py-1.5 hover:bg-[var(--muted)]">
               + דף חדש
             </Link>
@@ -55,6 +64,7 @@ export default async function PagePreview({ params }: Params) {
       <PageRenderer
         template={page.template}
         content={content}
+        imageUrl={page.image_url}
         business={{
           name: page.brief?.name || business.name,
           city: page.brief?.city || business.city,

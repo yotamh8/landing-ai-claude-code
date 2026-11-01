@@ -1,5 +1,6 @@
 // תבנית "יוקרתי": שנהב, שחור וזהב, כותרות סריף, קווים דקים, מרווחים נדיבים
 import { frank } from "./fonts";
+import { HeroImage } from "./hero-image";
 import type { TemplateProps } from "./types";
 
 const GOLD = "#b08d57";
@@ -8,7 +9,7 @@ function Label({ children }: { children: React.ReactNode }) {
   return <span className="text-sm font-medium" style={{ color: GOLD }}>{children}</span>;
 }
 
-export function PremiumTemplate({ content: c, business: b }: TemplateProps) {
+export function PremiumTemplate({ content: c, business: b, imageUrl }: TemplateProps) {
   const serif = frank.className;
   return (
     <div className="bg-[#faf7f2] text-[#1a1714]" style={{ fontFamily: "var(--font-heebo)" }}>
@@ -30,6 +31,12 @@ export function PremiumTemplate({ content: c, business: b }: TemplateProps) {
           {c.hero.ctaText}
         </a>
       </section>
+
+      <div className="mx-auto max-w-6xl px-6 pb-24">
+        <div className="border border-[#b08d57]/40 p-3">
+          <HeroImage src={imageUrl} style="premium" />
+        </div>
+      </div>
 
       <section className="border-y border-[#1a1714]/10 bg-white">
         <div className="mx-auto grid max-w-6xl gap-12 px-6 py-24 lg:grid-cols-2">

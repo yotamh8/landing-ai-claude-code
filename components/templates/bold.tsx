@@ -1,10 +1,11 @@
 // תבנית "אנרגטי": שחור וליים, כותרות ענקיות, מספור, גבולות עבים
 import { rubik } from "./fonts";
+import { HeroImage } from "./hero-image";
 import type { TemplateProps } from "./types";
 
 const LIME = "#d4ff3a";
 
-export function BoldTemplate({ content: c, business: b }: TemplateProps) {
+export function BoldTemplate({ content: c, business: b, imageUrl }: TemplateProps) {
   return (
     <div className={`${rubik.className} bg-[#0d0d0d] text-white`}>
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
@@ -24,6 +25,10 @@ export function BoldTemplate({ content: c, business: b }: TemplateProps) {
           </a>
         </div>
       </section>
+
+      <div className="mx-auto max-w-6xl px-6 pb-20">
+        <HeroImage src={imageUrl} style="bold" className="border-4 border-white" />
+      </div>
 
       <section className="bg-[#d4ff3a] text-black">
         <div className="mx-auto grid max-w-6xl gap-8 px-6 py-20 lg:grid-cols-[1fr_2fr]">
