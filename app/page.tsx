@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getMyBusiness } from "@/lib/business";
-import { signInWithGoogle, signOut } from "./auth/actions";
+import { signInWithGoogle } from "./auth/actions";
 
 export default async function Home({
   searchParams,
@@ -14,7 +14,7 @@ export default async function Home({
     data: { user },
   } = await supabase.auth.getUser();
   const business = user ? await getMyBusiness(supabase, user.id) : null;
-  if (user && !business) redirect("/onboarding");
+  if (user) redirect(business ? "/dashboard" : "/onboarding");
 
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col items-center justify-center gap-8 px-4 text-center">
@@ -29,23 +29,7 @@ export default async function Home({
         </p>
       )}
 
-      {user && business ? (
-        <div className="flex flex-col items-center gap-4">
-          <p className="text-lg">שלום, {business.name}</p>
-          <p className="text-sm opacity-70">
-            הכתובת שלך: <span dir="ltr" className="font-mono">/{business.slug}</span>
-          </p>
-          <form action={signOut}>
-            <button
-              type="submit"
-              className="rounded-xl border border-current px-6 py-3 font-medium hover:opacity-80"
-            >
-              התנתקות
-            </button>
-          </form>
-        </div>
-      ) : (
-        <form action={signInWithGoogle}>
+      <form action={signInWithGoogle}>
           <button
             type="submit"
             className="flex items-center gap-3 rounded-xl bg-white px-6 py-3 font-medium text-slate-900 shadow ring-1 ring-slate-200 hover:bg-slate-50"
@@ -59,7 +43,6 @@ export default async function Home({
             כניסה עם Google
           </button>
         </form>
-      )}
     </main>
   );
 }

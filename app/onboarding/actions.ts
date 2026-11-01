@@ -41,5 +41,5 @@ export async function createBusiness(
     return { error: "השמירה נכשלה. נסו שוב." };
   }
 
-  redirect("/");
+  redirect("/dashboard");
 }

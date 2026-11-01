@@ -3,12 +3,18 @@
 :root {
   --background: #f8fafc;
   --foreground: #0f172a;
+  --surface: #ffffff;
+  --muted: #f1f5f9;
+  --border: #e2e8f0;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0b1120;
     --foreground: #e2e8f0;
+    --surface: #111a2e;
+    --muted: #1e293b;
+    --border: #263248;
   }
 }
 
