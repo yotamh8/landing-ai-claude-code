@@ -86,7 +86,7 @@ export default async function DashboardPage() {
   return (
     <div className="min-h-screen">
       {/* כותרת עליונה */}
-      <header className="border-b border-[var(--border)] bg-[var(--surface)]">
+      <header className="material-bar sticky top-0 z-10 border-b border-[var(--border)]">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
           <div className="min-w-0">
             <p className="text-xs opacity-60">לוח בקרה</p>
@@ -94,9 +94,9 @@ export default async function DashboardPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="hidden text-left sm:block" dir="ltr">
-              <p className="text-sm font-medium" dir="auto">{displayName}</p>
-              <p className="text-xs opacity-60">{user.email}</p>
+            <div className="hidden text-end sm:block">
+              <p className="text-sm font-medium">{displayName}</p>
+              <p className="text-xs opacity-60" dir="ltr">{user.email}</p>
             </div>
             {avatarUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -116,7 +116,7 @@ export default async function DashboardPage() {
             <form action={signOut}>
               <button
                 type="submit"
-                className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-sm hover:bg-[var(--muted)]"
+                className="pressable rounded-lg border border-[var(--border)] px-3 py-1.5 text-sm hover:bg-[var(--muted)]"
               >
                 התנתקות
               </button>
@@ -179,7 +179,7 @@ export default async function DashboardPage() {
                       </p>
                       {l.message && <p className="mt-1 line-clamp-2 text-sm">{l.message}</p>}
                     </div>
-                    <div className="shrink-0 text-sm opacity-60 sm:text-left">
+                    <div className="shrink-0 text-sm opacity-60 sm:text-end">
                       <p>{dateFmt.format(new Date(l.created_at))}</p>
                       {l.pages?.title && <p className="truncate">מתוך: {l.pages.title}</p>}
                     </div>

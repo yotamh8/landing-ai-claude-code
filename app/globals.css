@@ -6,6 +6,11 @@
   --surface: #ffffff;
   --muted: #f1f5f9;
   --border: #e2e8f0;
+
+  /* עקומות easing (emil-design-eng). אף פעם לא ease-in ב-UI */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,4 +27,68 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-heebo), system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+/* כותרות: מרווח שורות צפוף ו-tracking שלילי ככל שהטקסט גדל (apple-design §15) */
+h1,
+h2 {
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+/* משוב לחיצה: מיידי, בלחיצה ולא בשחרור (apple-design §1, emil-design-eng) */
+.pressable {
+  transition:
+    transform 160ms var(--ease-out),
+    background-color 150ms ease,
+    opacity 150ms ease;
+}
+.pressable:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* חומר שקוף לסרגל העליון: התוכן גולל מתחתיו (apple-design §12) */
+.material-bar {
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* כניסה עדינה למסכים נדירים (כניסה ראשונה). לא במסכים שחוזרים הרבה */
+.enter {
+  transition:
+    opacity 250ms var(--ease-out),
+    transform 250ms var(--ease-out);
+  @starting-style {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pressable:active:not(:disabled) {
+    transform: none;
+  }
+  .enter {
+    transition: opacity 200ms ease;
+    @starting-style {
+      transform: none;
+    }
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .material-bar {
+    background: var(--surface);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .material-bar {
+    background: var(--surface);
+    border-color: var(--foreground);
+  }
 }

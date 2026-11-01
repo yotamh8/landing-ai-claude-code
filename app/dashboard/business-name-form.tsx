@@ -27,7 +27,7 @@ export function BusinessNameForm({ name }: { name: string }) {
         <button
           type="submit"
           disabled={pending}
-          className="rounded-lg bg-[var(--foreground)] px-5 py-2.5 font-medium text-[var(--background)] hover:opacity-90 disabled:opacity-50"
+          className="pressable rounded-lg bg-[var(--foreground)] px-5 py-2.5 font-medium text-[var(--background)] hover:opacity-90 disabled:opacity-50"
         >
           {pending ? "שומר..." : "שמירה"}
         </button>

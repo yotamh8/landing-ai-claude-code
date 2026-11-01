@@ -12,7 +12,7 @@ export default async function OnboardingPage() {
   if (await getMyBusiness(supabase, user.id)) redirect("/dashboard");
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-8 px-4">
+    <main className="enter mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-8 px-4">
       <div className="text-center">
         <h1 className="text-3xl font-bold">ברוכים הבאים!</h1>
         <p className="mt-2 opacity-80">נתחיל מכמה פרטים על העסק שלך.</p>

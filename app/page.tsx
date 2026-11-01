@@ -19,7 +19,7 @@ export default async function Home({
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col items-center justify-center gap-8 px-4 text-center">
       <h1 className="text-4xl font-bold sm:text-5xl">דפי נחיתה עם AI לעסקים קטנים</h1>
-      <p className="text-lg opacity-80">
+      <p className="max-w-md text-lg opacity-80">
         מספרים לנו על העסק, ואנחנו בונים לכם דף נחיתה מקצועי בכמה דקות.
       </p>
 
@@ -32,7 +32,7 @@ export default async function Home({
       <form action={signInWithGoogle}>
           <button
             type="submit"
-            className="flex items-center gap-3 rounded-xl bg-white px-6 py-3 font-medium text-slate-900 shadow ring-1 ring-slate-200 hover:bg-slate-50"
+            className="pressable flex items-center gap-3 rounded-xl bg-white px-6 py-3 font-medium text-slate-900 shadow ring-1 ring-slate-200 hover:bg-slate-50"
           >
             <svg aria-hidden="true" width="20" height="20" viewBox="0 0 48 48">
               <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z" />

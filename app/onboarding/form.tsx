@@ -11,7 +11,7 @@ export function OnboardingForm() {
   const [slug, setSlug] = useState("");
 
   return (
-    <form action={action} className="flex w-full flex-col gap-5 text-right">
+    <form action={action} className="flex w-full flex-col gap-5">
       <label className="flex flex-col gap-2">
         <span className="font-medium">שם העסק</span>
         <input
@@ -53,7 +53,7 @@ export function OnboardingForm() {
       <button
         type="submit"
         disabled={pending}
-        className="rounded-xl bg-slate-900 px-6 py-3 font-medium text-white hover:opacity-90 disabled:opacity-50 dark:bg-white dark:text-slate-900"
+        className="pressable rounded-xl bg-slate-900 px-6 py-3 font-medium text-white hover:opacity-90 disabled:opacity-50 dark:bg-white dark:text-slate-900"
       >
         {pending ? "שומר..." : "יצירת העסק"}
       </button>
